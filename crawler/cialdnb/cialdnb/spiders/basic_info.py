@@ -13,6 +13,7 @@ class BasicInfoSpider(scrapy.Spider):
 
         item["logo"] = self.find_logo(response)
         item["website"] = response.url
+        item["phones"] = self.find_phones(response)
 
         yield item
 
@@ -49,6 +50,6 @@ class BasicInfoSpider(scrapy.Spider):
 
         return match_logo
 
-    def find_phone(self, response):
+    def find_phones(self, response):
 
-        pass
+        return ""

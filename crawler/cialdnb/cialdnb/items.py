@@ -10,5 +10,5 @@ class CialdnbItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     logo = scrapy.Field()
-    phone = scrapy.Field()
+    phones = scrapy.Field()
     website = scrapy.Field()
