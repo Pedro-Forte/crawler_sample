@@ -5,14 +5,14 @@ from urllib.parse import urlparse
 
 class BasicInfoSpider(scrapy.Spider):
     name = 'basic_info'
-    # allowed_domains = ['www.cialdnb.com']
-    start_urls = ['https://www.unilever.com.br/']
+    start_urls = ['https://www.nestle.com.br/']
 
     def parse(self, response, **kwargs):
 
         item = CialdnbItem()
 
         item["logo"] = self.find_logo(response)
+        item["website"] = response.url
 
         yield item
 
