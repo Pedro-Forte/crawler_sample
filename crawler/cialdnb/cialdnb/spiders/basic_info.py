@@ -1,11 +1,12 @@
 import scrapy
 from ..items import CialdnbItem
 from urllib.parse import urlparse
+import re
 
 
 class BasicInfoSpider(scrapy.Spider):
     name = 'basic_info'
-    start_urls = ['https://www.nestle.com.br/']
+    start_urls = ['https://www.illion.com.au/contact-us/']
 
     def parse(self, response, **kwargs):
 
@@ -23,9 +24,9 @@ class BasicInfoSpider(scrapy.Spider):
         match_logo = ""
         blank_logo = ""
 
-        logo_try = [response.xpath("//img[re:test(@id, 'logo')]/@src").getall(),
-                    response.xpath("//img[re:test(@class, 'logo')]/@src").getall(),
-                    response.xpath("//img[re:test(@src, 'logo')]/@src").getall()]
+        logo_try = [response.xpath("//img[re:test(@id, '[lL][oO][gG][oO]')]/@src").getall(),
+                    response.xpath("//img[re:test(@class, '[lL][oO][gG][oO]')]/@src").getall(),
+                    response.xpath("//img[re:test(@src, '[lL][oO][gG][oO]')]/@src").getall()]
 
         for logo_list in logo_try:
             for logo in logo_list:
@@ -52,4 +53,19 @@ class BasicInfoSpider(scrapy.Spider):
 
     def find_phones(self, response):
 
-        return ""
+        phones = []
+
+        phones_try = [response.xpath("//*[re:test(@class, 'contact')]/text()").getall(),
+                      response.xpath("//*[re:test(@href, 'tel:')]/text()").getall(),
+                      response.xpath("//*[re:test(@href, 'phone')]/text()").getall(),
+                      response.xpath("//*[re:test(@href, '//+')]/text()").getall()]
+
+        for phones_list in phones_try:
+            for phone in phones_list:
+                phone_verification = phone.replace("+", " ").replace("/", " ")
+                phone_verification = ''.join(c for c in phone_verification if c.isdigit() or c == " " or c == "("
+                                             or c == ")")
+                if phone_verification.replace(" ", "") and len(phone_verification.replace(" ", "")) > 6:
+                    phones.append(phone_verification)
+
+        return phones
