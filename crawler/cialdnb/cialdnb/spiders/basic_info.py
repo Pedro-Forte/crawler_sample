@@ -1,12 +1,14 @@
 import scrapy
 from ..items import CialdnbItem
 from urllib.parse import urlparse
-import re
 
 
 class BasicInfoSpider(scrapy.Spider):
     name = 'basic_info'
-    start_urls = ['https://www.illion.com.au/contact-us/']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.start_urls = kwargs["domain"]
 
     def parse(self, response, **kwargs):
 
@@ -65,7 +67,9 @@ class BasicInfoSpider(scrapy.Spider):
                 phone_verification = phone.replace("+", " ").replace("/", " ")
                 phone_verification = ''.join(c for c in phone_verification if c.isdigit() or c == " " or c == "("
                                              or c == ")")
+
                 if phone_verification.replace(" ", "") and len(phone_verification.replace(" ", "")) > 6:
+                    # less than 6 char isnt considered as phone number
                     phones.append(phone_verification)
 
         return phones
