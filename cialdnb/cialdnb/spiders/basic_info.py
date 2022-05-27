@@ -64,7 +64,7 @@ class BasicInfoSpider(scrapy.Spider):
 
         for phones_list in phones_try:
             for phone in phones_list:
-                phone_verification = phone.replace("+", " ").replace("/", " ")
+                phone_verification = phone.replace("+", " ").replace("/", " ").replace("-", " ")
                 phone_verification = ''.join(c for c in phone_verification if c.isdigit() or c == " " or c == "("
                                              or c == ")")
 
