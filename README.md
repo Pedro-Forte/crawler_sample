@@ -27,4 +27,4 @@
   
 # About
 
-* Develop usin Pycharm IDE
+* Develop using Pycharm IDE
