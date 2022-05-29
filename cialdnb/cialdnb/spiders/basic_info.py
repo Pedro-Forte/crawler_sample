@@ -1,6 +1,7 @@
 import scrapy
 from ..items import CialdnbItem
 from urllib.parse import urlparse
+import re
 
 
 class BasicInfoSpider(scrapy.Spider):
@@ -56,6 +57,17 @@ class BasicInfoSpider(scrapy.Spider):
     def find_phones(self, response):
 
         phones = []
+        char_to_replace = {
+            "+": " ",
+            "/": " ",
+            "-": " "
+        }
+
+        phone_converter = {
+            "a": "2", "b": "2", "c": "2", "d": "3", "e": "3", "f": "3", "g": "4", "h": "4", "i": "4", "j": "5",
+            "k": "5", "l": "5", "m": "6", "n": "6", "o": "6", "p": "7", "q": "7", "r": "7", "s": "7", "t": "8",
+            "u": "8", "v": "8", "w": "9", "x": "9", "y": "9", "z": "9"
+        }
 
         phones_try = [response.xpath("//*[re:test(@class, 'contact')]/text()").getall(),
                       response.xpath("//*[re:test(@href, 'tel:')]/text()").getall(),
@@ -64,11 +76,21 @@ class BasicInfoSpider(scrapy.Spider):
 
         for phones_list in phones_try:
             for phone in phones_list:
-                phone_verification = phone.replace("+", " ").replace("/", " ").replace("-", " ")
-                phone_verification = ''.join(c for c in phone_verification if c.isdigit() or c == " " or c == "("
-                                             or c == ")")
+                # Replace +/- to " " using char_to_replace dict
+                phone_verification = re.sub(r"[+/-]",
+                                            lambda x: char_to_replace[x.group(0)],
+                                            phone)
 
-                if phone_verification.replace(" ", "") and len(phone_verification.replace(" ", "")) > 6:
+                if "0800 " in phone_verification:
+                    # This regex convert words to phone numbers
+                    phone_verification = re.sub(r"[a-z]",
+                                                lambda x: phone_converter[x.group(0)],
+                                                phone_verification.lower())
+
+                # Remove non numeric/parentheses/" " chars
+                phone_verification = re.sub("[^0-9() ]", "", phone_verification)
+
+                if len(phone_verification.replace(" ", "")) > 6:
                     # less than 6 char isnt considered as phone number
                     phones.append(phone_verification)
 
